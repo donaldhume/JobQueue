@@ -1,0 +1,412 @@
+import os
+import re
+import subprocess
+
+from tkinter import *
+from tkinter import filedialog
+from subprocess import *
+
+class JobQueue:
+        
+    def __init__(self, master):
+        
+        os.chdir("C:\ABAQUSJobs\DU02")
+        self.master = master
+        
+        self.maxCores = self.available_cpu_count()
+        self.cpuQueue = [0]*self.maxCores
+        
+        self.processList = [subprocess.Popen('dir',shell=True) for i in range(8)] 
+        
+        self.cores = 5
+        self.runNow = 0
+        self.counter = 0
+
+        self.frame = Frame(master)
+        self.frame.pack(side=TOP)
+        
+        self.frame3 = Frame(master,width=70)
+        self.frame3.pack(side=BOTTOM)
+        
+        self.frame2 = Frame(master, width=70, height=50)
+        self.frame2.pack(side=BOTTOM)
+        
+        self.listboxFin = Listbox(self.frame, width=70)
+        self.listboxFin.pack(side=TOP)
+        
+        self.listboxNew = Listbox(self.frame, width=70)
+        self.listboxNew.pack(side=TOP)
+        
+        self.entryLine = Entry(self.frame, width=70)
+        self.entryLine.pack(side=LEFT)
+        
+        self.addToQueue = Button(self.frame, text="Add", command=self.addToQueue)
+        self.addToQueue.pack(side=LEFT)
+        
+        self.startQueue = Button(self.frame2, text="Start", command=self.startFlag)
+        self.startQueue.pack(side=LEFT)
+        
+        self.stopQueue = Button(self.frame2, text="Stop", state="disabled", command=self.stopFlag)
+        self.stopQueue.pack(side=LEFT)
+        
+        self.readFile = Button(self.frame3, text="Read File", command=self.addFileToQueue)
+        self.readFile.pack(side=RIGHT)
+        
+        self.jobQueue()
+
+    def addFileToQueue(self):		
+        filename=filedialog.askopenfilename(initialdir="C:/ABAQUSJobs/DU02",title="Choose job file",filetypes=(("text files","*.txt"),("all files","*.*")))
+        		
+        if filename:
+            file = open(filename,'r')
+            for line in file:
+                self.listboxNew.insert(END,line) 
+            file.close()
+ 
+        
+    def addToQueue(self):
+        x = self.entryLine.get()
+        self.listboxNew.insert(0,x)
+        self.entryLine.delete(0,END)
+        
+    def getJobName(self):
+        name = self.listboxNew.get(0,last=None) 
+        self.listboxNew.delete(0,last=None)
+        self.listboxFin.insert(0,name)
+        return name
+           
+      
+    def startFlag(self):
+        self.runNow = 1
+        self.startQueue['state'] = 'disabled'
+        self.stopQueue['state'] = 'normal'
+            
+    def stopFlag(self):
+        self.runNow = 0
+        self.startQueue['state'] = 'normal'
+        self.stopQueue['state'] = 'disabled'         
+    
+    def jobQueue(self):
+          
+        if(self.runNow==1 and self.listboxNew.size()>0):
+            
+            #print self.counter
+            #self.counter = self.counter+1
+            
+            for position in range(0,self.cores):
+                            
+                # CORE 0
+                if(position==0):
+                    if(self.cpuQueue[position]==0):
+                                       
+                        # pull top job
+                        jobName = self.getJobName()
+                        jobNameSplit = jobName.split()
+                    
+                        # run job  Try/except catch for job name?
+                        self.processList[position] = subprocess.Popen(jobNameSplit,creationflags=CREATE_NEW_CONSOLE)
+                                        
+                        if (self.processList[position] == 1234567):
+                            print("failed to launch process")
+                        else:
+                            self.cpuQueue[position]=1
+                            break
+                        
+                    if(self.cpuQueue[position]==1 and self.processList[position].poll()==0):
+                        self.cpuQueue[position] = 0
+                        
+                    if(self.cpuQueue[position]==1 and self.processList[position].poll()==1):
+                        print("Job on Core 0 did not run properly")
+                        self.cpuQueue[position] = 0        
+                
+                # CORE 1
+                elif(position==1):
+                    if(self.cpuQueue[position]==0):
+                                       
+                        # pull top job
+                        jobName = self.getJobName()
+                        jobNameSplit = jobName.split()
+                    
+                        # run job  Try/except catch for job name?
+                        self.processList[position] = subprocess.Popen(jobNameSplit,creationflags=CREATE_NEW_CONSOLE)
+                                        
+                        if (self.processList[position] == 1234567):
+                            print("failed to launch process")
+                        else:
+                            self.cpuQueue[position]=1
+                            break
+                        
+                    if(self.cpuQueue[position]==1 and self.processList[position].poll()==0):
+                        self.cpuQueue[position] = 0
+                        
+                    if(self.cpuQueue[position]==1 and self.processList[position].poll()==1):
+                        print("Job on Core 1 did not run properly")
+                        self.cpuQueue[position] = 0        
+        
+                # CORE 2
+                elif(position==2):
+                    if(self.cpuQueue[position]==0):
+                                       
+                        # pull top job
+                        jobName = self.getJobName()
+                        jobNameSplit = jobName.split()
+                    
+                        # run job  Try/except catch for job name?
+                        self.processList[position] = subprocess.Popen(jobNameSplit,creationflags=CREATE_NEW_CONSOLE)
+                                        
+                        if (self.processList[position] == 1234567):
+                            print("failed to launch process")
+                        else:
+                            self.cpuQueue[position]=1
+                            break
+                        
+                    if(self.cpuQueue[position]==1 and self.processList[position].poll()==0):
+                        self.cpuQueue[position] = 0
+                        
+                    if(self.cpuQueue[position]==1 and self.processList[position].poll()==1):
+                        print("Job on Core 2 did not run properly")
+                        self.cpuQueue[position] = 0        
+        
+                # CORE 3
+                elif(position==3):
+                    if(self.cpuQueue[position]==0):
+                                       
+                        # pull top job
+                        jobName = self.getJobName()
+                        jobNameSplit = jobName.split()
+                    
+                        # run job  Try/except catch for job name?
+                        self.processList[position] = subprocess.Popen(jobNameSplit,creationflags=CREATE_NEW_CONSOLE)
+                                        
+                        if (self.processList[position] == 1234567):
+                            print("failed to launch process")
+                        else:
+                            self.cpuQueue[position]=1
+                            break
+                        
+                    if(self.cpuQueue[position]==1 and self.processList[position].poll()==0):
+                        self.cpuQueue[position] = 0
+                        
+                    if(self.cpuQueue[position]==1 and self.processList[position].poll()==1):
+                        print("Job on Core 3 did not run properly")
+                        self.cpuQueue[position] = 0        
+        
+        
+                # CORE 4
+                elif(position==4):
+                    if(self.cpuQueue[position]==0):
+                                       
+                        # pull top job
+                        jobName = self.getJobName()
+                        jobNameSplit = jobName.split()
+                    
+                        # run job  Try/except catch for job name?
+                        self.processList[position] = subprocess.Popen(jobNameSplit,creationflags=CREATE_NEW_CONSOLE)
+                                        
+                        if (self.processList[position] == 1234567):
+                            print("failed to launch process")
+                        else:
+                            self.cpuQueue[position]=1
+                            break
+                        
+                    if(self.cpuQueue[position]==1 and self.processList[position].poll()==0):
+                        self.cpuQueue[position] = 0
+                        
+                    if(self.cpuQueue[position]==1 and self.processList[position].poll()==1):
+                        print("Job on Core 4 did not run properly")
+                        self.cpuQueue[position] = 0        
+        
+                # CORE 5
+                elif(position==5):
+                    if(self.cpuQueue[position]==0):
+                                       
+                        # pull top job
+                        jobName = self.getJobName()
+                        jobNameSplit = jobName.split()
+                    
+                        # run job  Try/except catch for job name?
+                        self.processList[position] = subprocess.Popen(jobNameSplit,creationflags=CREATE_NEW_CONSOLE)
+                                        
+                        if (self.processList[position] == 1234567):
+                            print("failed to launch process")
+                        else:
+                            self.cpuQueue[position]=1
+                            break
+                        
+                    if(self.cpuQueue[position]==1 and self.processList[position].poll()==0):
+                        self.cpuQueue[position] = 0
+                        
+                    if(self.cpuQueue[position]==1 and self.processList[position].poll()==1):
+                        print("Job on Core 5 did not run properly")
+                        self.cpuQueue[position] = 0        
+        
+                # CORE 6
+                elif(position==6):
+                    if(self.cpuQueue[position]==0):
+                                       
+                        # pull top job
+                        jobName = self.getJobName()
+                        jobNameSplit = jobName.split()
+                    
+                        # run job  Try/except catch for job name?
+                        self.processList[position] = subprocess.Popen(jobNameSplit,creationflags=CREATE_NEW_CONSOLE)
+                                        
+                        if (self.processList[position] == 1234567):
+                            print("failed to launch process")
+                        else:
+                            self.cpuQueue[position]=1
+                            break
+                        
+                    if(self.cpuQueue[position]==1 and self.processList[position].poll()==0):
+                        self.cpuQueue[position] = 0
+                        
+                    if(self.cpuQueue[position]==1 and self.processList[position].poll()==1):
+                        print("Job on Core 6 did not run properly")
+                        self.cpuQueue[position] = 0        
+        
+        
+                # CORE 7
+                elif(position==7):
+                    if(self.cpuQueue[position]==0):
+                                       
+                        # pull top job
+                        jobName = self.getJobName()
+                        jobNameSplit = jobName.split()
+                    
+                        # run job  Try/except catch for job name?
+                        self.processList[position] = subprocess.Popen(jobNameSplit,creationflags=CREATE_NEW_CONSOLE)
+                                        
+                        if (self.processList[position] == 1234567):
+                            print("failed to launch process")
+                        else:
+                            self.cpuQueue[position]=1
+                            break
+                        
+                    if(self.cpuQueue[position]==1 and self.processList[position].poll()==0):
+                        self.cpuQueue[position] = 0
+                        
+                    if(self.cpuQueue[position]==1 and self.processList[position].poll()==1):
+                        print("Job on Core 7 did not run properly")
+                        self.cpuQueue[position] = 0        
+        
+        
+        self.master.after(10000, self.jobQueue)
+    
+    def available_cpu_count(self):
+        """ Number of available virtual or physical CPUs on this system, i.e.
+        user/real as output by time(1) when called with an optimally scaling
+        userspace-only program"""
+
+        # cpuset
+        # cpuset may restrict the number of *available* processors
+        try:
+            m = re.search(r'(?m)^Cpus_allowed:\s*(.*)$',
+                        open('/proc/self/status').read())
+            if m:
+                res = bin(int(m.group(1).replace(',', ''), 16)).count('1')
+                if res > 0:
+                    return res
+        except IOError:
+            pass
+    
+        # Python 2.6+
+        try:
+            import multiprocessing
+            return multiprocessing.cpu_count()
+        except (ImportError, NotImplementedError):
+            pass
+    
+        # http://code.google.com/p/psutil/
+        try:
+            import psutil
+            return psutil.cpu_count()   # psutil.NUM_CPUS on old versions
+        except (ImportError, AttributeError):
+            pass
+    
+        # POSIX
+        try:
+            res = int(os.sysconf('SC_NPROCESSORS_ONLN'))
+    
+            if res > 0:
+                return res
+        except (AttributeError, ValueError):
+            pass
+    
+        # Windows
+        try:
+            res = int(os.environ['NUMBER_OF_PROCESSORS'])
+    
+            if res > 0:
+                return res
+        except (KeyError, ValueError):
+            pass
+    
+        # jython
+        try:
+            from java.lang import Runtime
+            runtime = Runtime.getRuntime()
+            res = runtime.availableProcessors()
+            if res > 0:
+                return res
+        except ImportError:
+            pass
+    
+        # BSD
+        try:
+            sysctl = subprocess.Popen(['sysctl', '-n', 'hw.ncpu'],
+                                    stdout=subprocess.PIPE)
+            scStdout = sysctl.communicate()[0]
+            res = int(scStdout)
+    
+            if res > 0:
+                return res
+        except (OSError, ValueError):
+            pass
+
+        # Linux
+        try:
+            res = open('/proc/cpuinfo').read().count('processor\t:')
+    
+            if res > 0:
+                return res
+        except IOError:
+            pass
+    
+        # Solaris
+        try:
+            pseudoDevices = os.listdir('/devices/pseudo/')
+            res = 0
+            for pd in pseudoDevices:
+                if re.match(r'^cpuid@[0-9]+$', pd):
+                    res += 1
+    
+            if res > 0:
+                return res
+        except OSError:
+            pass
+    
+        # Other UNIXes (heuristic)
+        try:
+            try:
+                dmesg = open('/var/run/dmesg.boot').read()
+            except IOError:
+                dmesgProcess = subprocess.Popen(['dmesg'], stdout=subprocess.PIPE)
+                dmesg = dmesgProcess.communicate()[0]
+    
+            res = 0
+            while '\ncpu' + str(res) + ':' in dmesg:
+                res += 1
+    
+            if res > 0:
+                return res
+        except OSError:
+            pass
+    
+        raise Exception('Can not determine number of CPUs on this system')
+
+root = Tk()
+
+app = JobQueue(root)
+
+root.mainloop()
+#root.destroy() # optional; see description below
