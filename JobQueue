@@ -1,24 +1,24 @@
 import os
 import re
 import subprocess
+import tkFileDialog
 
-from tkinter import *
-from tkinter import filedialog
+from Tkinter import *
 from subprocess import *
 
 class JobQueue:
         
     def __init__(self, master):
         
-        os.chdir("C:\ABAQUSJobs\DU02")
+        os.chdir("C:\ABAQUSJobs\DU02Fresh")
         self.master = master
         
         self.maxCores = self.available_cpu_count()
         self.cpuQueue = [0]*self.maxCores
         
-        self.processList = [subprocess.Popen('dir',shell=True) for i in range(8)] 
+        self.processList = [subprocess.Popen('echo Setting up process list..',shell=True) for i in range(8)] 
         
-        self.cores = 5
+        self.cores = 4
         self.runNow = 0
         self.counter = 0
 
@@ -54,15 +54,14 @@ class JobQueue:
         
         self.jobQueue()
 
-    def addFileToQueue(self):		
-        filename=filedialog.askopenfilename(initialdir="C:/ABAQUSJobs/DU02",title="Choose job file",filetypes=(("text files","*.txt"),("all files","*.*")))
-        		
-        if filename:
-            file = open(filename,'r')
+    def addFileToQueue(self):
+        file = tkFileDialog.askopenfile(parent=self.master,mode='rb',title='Choose a file')
+        
+        if file != None:
             for line in file:
                 self.listboxNew.insert(END,line) 
             file.close()
- 
+                       
         
     def addToQueue(self):
         x = self.entryLine.get()
@@ -88,209 +87,30 @@ class JobQueue:
     
     def jobQueue(self):
           
-        if(self.runNow==1 and self.listboxNew.size()>0):
-            
-            #print self.counter
-            #self.counter = self.counter+1
-            
+        if(self.runNow==1 and self.listboxNew.size()>0):            
             for position in range(0,self.cores):
-                            
-                # CORE 0
-                if(position==0):
-                    if(self.cpuQueue[position]==0):
-                                       
-                        # pull top job
-                        jobName = self.getJobName()
-                        jobNameSplit = jobName.split()
+                if(self.cpuQueue[position]==0):
+                    # pull top job
+                    jobName = self.getJobName()
+                    jobNameSplit = jobName.split()
                     
-                        # run job  Try/except catch for job name?
-                        self.processList[position] = subprocess.Popen(jobNameSplit,creationflags=CREATE_NEW_CONSOLE)
+                    # run job  Try/except catch for job name?
+                    self.processList[position] = subprocess.Popen(jobNameSplit,creationflags=CREATE_NEW_CONSOLE)
                                         
-                        if (self.processList[position] == 1234567):
-                            print("failed to launch process")
-                        else:
-                            self.cpuQueue[position]=1
-                            break
+                    if (self.processList[position] == 1234567):
+                        print "failed to launch process"
+                    else:
+                        self.cpuQueue[position]=1
+                        break
                         
-                    if(self.cpuQueue[position]==1 and self.processList[position].poll()==0):
-                        self.cpuQueue[position] = 0
+                if(self.cpuQueue[position]==1 and self.processList[position].poll()==0):
+                    self.cpuQueue[position] = 0
                         
-                    if(self.cpuQueue[position]==1 and self.processList[position].poll()==1):
-                        print("Job on Core 0 did not run properly")
-                        self.cpuQueue[position] = 0        
+                if(self.cpuQueue[position]==1 and self.processList[position].poll()==1):
+                    print "Job on Core 0 did not run properly"
+                    self.cpuQueue[position] = 0        
                 
-                # CORE 1
-                elif(position==1):
-                    if(self.cpuQueue[position]==0):
-                                       
-                        # pull top job
-                        jobName = self.getJobName()
-                        jobNameSplit = jobName.split()
-                    
-                        # run job  Try/except catch for job name?
-                        self.processList[position] = subprocess.Popen(jobNameSplit,creationflags=CREATE_NEW_CONSOLE)
-                                        
-                        if (self.processList[position] == 1234567):
-                            print("failed to launch process")
-                        else:
-                            self.cpuQueue[position]=1
-                            break
-                        
-                    if(self.cpuQueue[position]==1 and self.processList[position].poll()==0):
-                        self.cpuQueue[position] = 0
-                        
-                    if(self.cpuQueue[position]==1 and self.processList[position].poll()==1):
-                        print("Job on Core 1 did not run properly")
-                        self.cpuQueue[position] = 0        
-        
-                # CORE 2
-                elif(position==2):
-                    if(self.cpuQueue[position]==0):
-                                       
-                        # pull top job
-                        jobName = self.getJobName()
-                        jobNameSplit = jobName.split()
-                    
-                        # run job  Try/except catch for job name?
-                        self.processList[position] = subprocess.Popen(jobNameSplit,creationflags=CREATE_NEW_CONSOLE)
-                                        
-                        if (self.processList[position] == 1234567):
-                            print("failed to launch process")
-                        else:
-                            self.cpuQueue[position]=1
-                            break
-                        
-                    if(self.cpuQueue[position]==1 and self.processList[position].poll()==0):
-                        self.cpuQueue[position] = 0
-                        
-                    if(self.cpuQueue[position]==1 and self.processList[position].poll()==1):
-                        print("Job on Core 2 did not run properly")
-                        self.cpuQueue[position] = 0        
-        
-                # CORE 3
-                elif(position==3):
-                    if(self.cpuQueue[position]==0):
-                                       
-                        # pull top job
-                        jobName = self.getJobName()
-                        jobNameSplit = jobName.split()
-                    
-                        # run job  Try/except catch for job name?
-                        self.processList[position] = subprocess.Popen(jobNameSplit,creationflags=CREATE_NEW_CONSOLE)
-                                        
-                        if (self.processList[position] == 1234567):
-                            print("failed to launch process")
-                        else:
-                            self.cpuQueue[position]=1
-                            break
-                        
-                    if(self.cpuQueue[position]==1 and self.processList[position].poll()==0):
-                        self.cpuQueue[position] = 0
-                        
-                    if(self.cpuQueue[position]==1 and self.processList[position].poll()==1):
-                        print("Job on Core 3 did not run properly")
-                        self.cpuQueue[position] = 0        
-        
-        
-                # CORE 4
-                elif(position==4):
-                    if(self.cpuQueue[position]==0):
-                                       
-                        # pull top job
-                        jobName = self.getJobName()
-                        jobNameSplit = jobName.split()
-                    
-                        # run job  Try/except catch for job name?
-                        self.processList[position] = subprocess.Popen(jobNameSplit,creationflags=CREATE_NEW_CONSOLE)
-                                        
-                        if (self.processList[position] == 1234567):
-                            print("failed to launch process")
-                        else:
-                            self.cpuQueue[position]=1
-                            break
-                        
-                    if(self.cpuQueue[position]==1 and self.processList[position].poll()==0):
-                        self.cpuQueue[position] = 0
-                        
-                    if(self.cpuQueue[position]==1 and self.processList[position].poll()==1):
-                        print("Job on Core 4 did not run properly")
-                        self.cpuQueue[position] = 0        
-        
-                # CORE 5
-                elif(position==5):
-                    if(self.cpuQueue[position]==0):
-                                       
-                        # pull top job
-                        jobName = self.getJobName()
-                        jobNameSplit = jobName.split()
-                    
-                        # run job  Try/except catch for job name?
-                        self.processList[position] = subprocess.Popen(jobNameSplit,creationflags=CREATE_NEW_CONSOLE)
-                                        
-                        if (self.processList[position] == 1234567):
-                            print("failed to launch process")
-                        else:
-                            self.cpuQueue[position]=1
-                            break
-                        
-                    if(self.cpuQueue[position]==1 and self.processList[position].poll()==0):
-                        self.cpuQueue[position] = 0
-                        
-                    if(self.cpuQueue[position]==1 and self.processList[position].poll()==1):
-                        print("Job on Core 5 did not run properly")
-                        self.cpuQueue[position] = 0        
-        
-                # CORE 6
-                elif(position==6):
-                    if(self.cpuQueue[position]==0):
-                                       
-                        # pull top job
-                        jobName = self.getJobName()
-                        jobNameSplit = jobName.split()
-                    
-                        # run job  Try/except catch for job name?
-                        self.processList[position] = subprocess.Popen(jobNameSplit,creationflags=CREATE_NEW_CONSOLE)
-                                        
-                        if (self.processList[position] == 1234567):
-                            print("failed to launch process")
-                        else:
-                            self.cpuQueue[position]=1
-                            break
-                        
-                    if(self.cpuQueue[position]==1 and self.processList[position].poll()==0):
-                        self.cpuQueue[position] = 0
-                        
-                    if(self.cpuQueue[position]==1 and self.processList[position].poll()==1):
-                        print("Job on Core 6 did not run properly")
-                        self.cpuQueue[position] = 0        
-        
-        
-                # CORE 7
-                elif(position==7):
-                    if(self.cpuQueue[position]==0):
-                                       
-                        # pull top job
-                        jobName = self.getJobName()
-                        jobNameSplit = jobName.split()
-                    
-                        # run job  Try/except catch for job name?
-                        self.processList[position] = subprocess.Popen(jobNameSplit,creationflags=CREATE_NEW_CONSOLE)
-                                        
-                        if (self.processList[position] == 1234567):
-                            print("failed to launch process")
-                        else:
-                            self.cpuQueue[position]=1
-                            break
-                        
-                    if(self.cpuQueue[position]==1 and self.processList[position].poll()==0):
-                        self.cpuQueue[position] = 0
-                        
-                    if(self.cpuQueue[position]==1 and self.processList[position].poll()==1):
-                        print("Job on Core 7 did not run properly")
-                        self.cpuQueue[position] = 0        
-        
-        
-        self.master.after(10000, self.jobQueue)
+        self.master.after(100000, self.jobQueue)
     
     def available_cpu_count(self):
         """ Number of available virtual or physical CPUs on this system, i.e.
